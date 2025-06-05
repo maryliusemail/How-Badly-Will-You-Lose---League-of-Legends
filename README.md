@@ -107,33 +107,27 @@ This is a **binary classification problem**, where the target variable is `is_st
 
 We chose this variable because stomp games highlight major disparities in early-game performance and can offer insight into dominant playstyles. Predicting them using early indicators could help coaches, analysts, or broadcasters understand which games are likely to snowball out of control.
 
-To ensure that we are only using information available at the **time of prediction**, all features were limited to statistics recorded within the first 15 minutes of the match. This simulates a real-time prediction scenario and avoids data leakage from later events.
+To ensure that we are only using information available at the **time of prediction**, all features were limited to statistics recorded within the first 15 minutes of the match. 
 
 ## Baseline Model
 
-For our baseline model, we used **logistic regression**, a simple but effective classification algorithm. It provides a strong starting point due to its interpretability and speed, and allows us to establish a benchmark for more complex models.
+For my baseline model, I used a **Logistic Regression** classifier with balanced class weights to address the class imbalance in the target variable. The model was trained on seven features: `golddiffat15`, `killsat15`, `deathsat15`, `firstdragon`, `firstherald`, `firsttower`, and `gamelength`. The first four features are quantitative and were standardized using `StandardScaler` to ensure consistent scaling, particularly since game durations can vary significantly. The last three features are binary categorical variables that capture key in-game objectives, and they were one-hot encoded after imputing missing values with the most frequent category.
 
-### Features
+To improve upon this baseline, I plan to experiment with different types of models such as **Random Forests**, **Gradient Boosting**, and other **ensemble methods** to better capture non-linear relationships and improve overall predictive performance.
 
-We used 21 input features:
 
-- **16 quantitative features**: Continuous values such as gold difference at 10 and 15 minutes, kills, assists, deaths, vision score, and damage taken per minute.
-- **5 nominal categorical features**: Binary indicators for early-game objectives like `firstblood`, `firstdragon`, `firstherald`, `firsttower`, and `result`.
+## Final Model
 
-There are no ordinal features in this dataset.
+In my final model, I used a **Random Forest Classifier** to improve upon the baseline logistic regression model. I kept the same set of seven features: `golddiffat15`, `killsat15`, `deathsat15`, `firstdragon`, `firstherald`, `firsttower`, and `gamelength`. These features were selected because they reflect both early and mid-game performance, as well as objective control, all of which are important indicators of whether a match is a “stomp.” The quantitative features were standardized using `StandardScaler`, and the categorical features were one-hot encoded after imputation.
 
-### Preprocessing
+Compared to logistic regression, Random Forest offers the ability to model complex, non-linear relationships and interactions between features, making it a strong choice for capturing the dynamics of League of Legends matches. To ensure robustness, I used class-balanced weighting and left the default number of trees at 100, with a fixed random state to ensure reproducibility.
 
-We constructed a full modeling pipeline using `scikit-learn`:
+After training the model on an 80/20 stratified split and evaluating it on the test set, my final model achieved an **F1 score of 0.9907**. This represents a substantial improvement over the baseline model’s F1 score of **0.5295**, indicating that the Random Forest classifier is highly effective at capturing the underlying patterns in the data. Both precision and recall are near perfect, suggesting that the model performs exceptionally well in identifying “stomp” games with very few false positives or false negatives.
 
-- **Numerical features** were imputed using their **mean** and scaled with `StandardScaler`.
-- **Categorical features** were imputed with the **most frequent** value and one-hot encoded via `OneHotEncoder`.
+This performance demonstrates that switching to a more powerful model, even without adding new features or tuning hyperparameters extensively, can yield dramatic gains in predictive power.
 
-### Model Training and Evaluation
 
-We split the dataset into training and testing sets (80/20), stratified by the target variable to preserve class balance. Since stomp games are relatively rare, we used `class_weight='balanced'` in logistic regression to account for the imbalance.
 
-After fitting the model, we evaluated its performance using the **classification report**, which includes **precision, recall, and F1-score**.
 
 
 
