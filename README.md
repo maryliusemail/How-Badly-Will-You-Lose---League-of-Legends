@@ -27,15 +27,15 @@ The last step was creating a new column called `is_stomp`, which flags whether a
 |            528 |         -587 |            1 |            443 |         -497 |            7 |           1 |             1 |            0 |           1 |             2 |            2 |            1 |           nan |           nan |          nan |            69 |                475.026 | complete           |         1713 |        0 |          0 |
 
 
-
-### Gold Difference at 15 Minutes – Stomp vs. Non-Stomp
+### Game Length Distribution
 
 <iframe
-  src="assets/golddiffat15_by_stomp.html"
+  src="assets/game_length.html"
   width="800"
   height="500"
-  frameborder="0"
-></iframe>
+  frameborder="0">
+</iframe>
 
-This plot compares gold difference at 15 minutes for stomp and non-stomp games. Stomp games tend to have more extreme gold differences — either large leads or large deficits — while non-stomp games cluster more around even gold states.
+This plot shows the distribution of game lengths across all matches.
+
 
