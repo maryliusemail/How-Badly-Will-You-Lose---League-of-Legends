@@ -168,6 +168,32 @@ The best hyperparameters found were:
 Using these hyperparameters, the final model achieved an **F1 score of 0.9902** on the same test set as the baseline. This is a big improvement over the baseline score of 0.5303!
 
 
+## Fairness Analysis
+
+To evaluate the fairness of my Final Model, I examined whether the model performs differently for two groups based on early-game objective control:
+
+- **Group X**: Teams that did *not* secure the first dragon (`firstdragon = 0`)
+- **Group Y**: Teams that *did* secure the first dragon (`firstdragon = 1`)
+
+I chose **precision** as the evaluation metric, as it reflects how often the model is correct when it predicts a "stomp" — which is especially important when such predictions may influence decision-making or further analysis.
+
+### Hypotheses
+
+- **Null Hypothesis (H₀)**: The model is fair. Precision is equal for both groups, and any observed difference is due to chance.
+- **Alternative Hypothesis (H₁)**: The model is unfair. Precision is lower for teams that did **not** secure first dragon (Group X).
+
+### Method
+
+Using the final fitted Random Forest model (`n_estimators = 50`, `max_depth = 10`), I predicted outcomes on the held-out test set. I computed the **precision** separately for Group X and Group Y, and then ran a **permutation test with 1000 iterations**. In each iteration, I shuffled the group assignments and recalculated the difference in precision between the two groups.
+
+### Results and Conclusion
+
+- **Observed Precision Difference (Y - X)**: **-0.0004**  
+- **P-value**: **0.5400**
+
+The observed precision difference between the two groups was extremely small and not statistically significant, with a p-value of 0.5400. As a result, we **fail to reject the null hypothesis**, meaning that we **do not find evidence of unfairness** in model performance between teams that secured the first dragon and those that did not.
+
+This suggests that the model performs **equally well across both groups**, at least in terms of precision. While fairness should always be considered in deployment, the results here indicate no immediate concern based on this dimension of in-game performance.
 
 
 
