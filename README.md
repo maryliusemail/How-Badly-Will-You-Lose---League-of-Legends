@@ -98,33 +98,31 @@ We used a permutation test comparing the mean game length of two groups: games w
 This p-value is well below the standard significance threshold of 0.05, so we **reject the null hypothesis**. This provides strong statistical evidence that early-game dominance (measured by kill difference at 15 minutes) is associated with significantly shorter game durations. In other words, early aggression often leads to quicker wins in League of Legends.
 
 ## Framing a Prediction Problem
-The goal of this project is to **predict whether a League of Legends match is a "stomp"** using early- and mid-game statistics. A *stomp* is defined as a game that ends in under 25 minutes (1500 seconds) where the winning team had a gold lead of at least 1500 at the 15-minute mark.
 
-This is a **binary classification problem**, and the **response variable** is:
+The main goal of this project is to **predict whether a professional League of Legends game ends up being a stomp**—a match that finishes quickly (under 25 minutes) and is heavily one-sided by the 15-minute mark. Specifically, a stomp is when the winning team had at least a 1500 gold lead at 15 minutes, or the losing team was behind by that much.
 
-- `is_stomp`:  
-  - `1` if the game was a stomp  
-  - `0` otherwise
+This is a **binary classification problem**, meaning we’re trying to answer a yes-or-no question:  
+**Was the game a stomp or not?**  
+The outcome we’re trying to predict is stored in a column called `is_stomp`, where:
+- `1` = the game was a stomp  
+- `0` = the game was not a stomp
 
-We chose this prediction target because stomped games represent highly unbalanced matches and early indicators of such games can reveal valuable patterns about how early momentum translates into game outcomes.
+To make this prediction, we only use information that would be available during the early and mid-game. That includes:
+- Gold, XP, and CS (minion farm) differences at 10 and 15 minutes
+- Kills, assists, and deaths at those same time points
+- Whether the team got first blood, first dragon, first Rift Herald, and first tower
+- Vision score, damage stats, and the overall game length and result
 
-The **features** used for prediction include:
-- Differences in team stats at 10 and 15 minutes:  
-  - Gold, experience, CS, kills, assists, deaths
-- Objective control:  
-  - Whether the team secured first blood, first dragon, first herald, or first tower
-- Combat metrics:  
-  - Team damage dealt, vision score
-- Other:  
-  - Game length, match result
+To train the model, I used a **logistic regression classifier** with some helpful tools from scikit-learn:
+- Missing numbers in numerical features were filled in with the average, and values were scaled
+- For categorical features (like first blood), missing entries were filled with the most common value and converted into numeric form
+- I bundled everything into a pipeline, so the whole process—cleaning, transforming, and training—is done all at once
 
-We ensure that all features used for prediction are observable **before or at 15 minutes**, which respects the "time of prediction" principle—i.e., we are not using information that would only be known after the point we are trying to make a prediction.
+The model was trained using **80% of the data** and tested on the remaining **20%**, while keeping the ratio of stomp vs. non-stomp games balanced. I also adjusted for the fact that stomp games are less common so that the model doesn’t just learn to predict “not a stomp” every time.
 
-The **evaluation metric** we selected is **F1-score**, which balances precision and recall. This is especially important here because:
-- Stomp games are relatively rare compared to non-stomp games (i.e., class imbalance),
-- We care not only about correctly identifying stomp games (recall), but also about minimizing false positives (precision).
+To evaluate the model, I looked at the **F1-score**, which is a good balance of precision and recall. This metric is helpful here because we care both about *correctly identifying stomp games* and *not labeling normal games as stomps by mistake*.
 
-By using the F1-score, we aim to build a model that effectively identifies stomp games without over-predicting them.
+Overall, this setup helps us understand whether early-game stats are strong indicators of how one-sided a match will turn out.
 
 
 
