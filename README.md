@@ -67,3 +67,13 @@ Since the missingness seems related to in-game behavior—such as early-game tem
 
 To possibly treat this column as **Missing At Random (MAR)** instead, I would need more contextual data. For instance, knowing whether the Herald spawned at all, whether teams moved toward the objective, or if the game ended before it became relevant could help explain the missingness based on observed variables. With that information, a predictive model could account for the missing values in a MAR framework.
 
+### Permutation Test: Kills at 15 Minutes vs. First Herald Missingness
+
+<iframe
+  src="assets/killsat15_permutation.html"
+  width="800"
+  height="600"
+  frameborder="0"
+></iframe>
+
+The plot above shows the null distribution of the difference in mean kills at 15 minutes between games where the `firstherald` value is missing and where it is not. The observed difference (red dashed line) is **-3.259**, and the computed p-value is **0.0000**. This result suggests that the missingness of `firstherald` is not random — it likely depends on early-game performance, specifically team kills by the 15-minute mark.
