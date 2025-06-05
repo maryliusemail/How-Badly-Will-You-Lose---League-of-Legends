@@ -99,30 +99,43 @@ This p-value is well below the standard significance threshold of 0.05, so we **
 
 ## Framing a Prediction Problem
 
-The main goal of this project is to **predict whether a professional League of Legends game ends up being a stomp**—a match that finishes quickly (under 25 minutes) and is heavily one-sided by the 15-minute mark. Specifically, a stomp is when the winning team had at least a 1500 gold lead at 15 minutes, or the losing team was behind by that much.
+The goal of this project is to **predict whether a professional League of Legends game is a "stomp"** based on early- and mid-game statistics. A **stomp** is defined as a game that lasts less than 25 minutes (1500 seconds) and where the winning team has a gold lead of at least 1500 at 15 minutes, or the losing team has a deficit of at least 1500 gold at the same time.
 
-This is a **binary classification problem**, meaning we’re trying to answer a yes-or-no question:  
-**Was the game a stomp or not?**  
-The outcome we’re trying to predict is stored in a column called `is_stomp`, where:
-- `1` = the game was a stomp  
-- `0` = the game was not a stomp
+This is a **binary classification problem**, where the target variable is `is_stomp`:
+- `1` indicates the game was a stomp
+- `0` indicates it was not
 
-To make this prediction, we only use information that would be available during the early and mid-game. That includes:
-- Gold, XP, and CS (minion farm) differences at 10 and 15 minutes
-- Kills, assists, and deaths at those same time points
-- Whether the team got first blood, first dragon, first Rift Herald, and first tower
-- Vision score, damage stats, and the overall game length and result
+We chose this variable because stomp games highlight major disparities in early-game performance and can offer insight into dominant playstyles. Predicting them using early indicators could help coaches, analysts, or broadcasters understand which games are likely to snowball out of control.
 
-To train the model, I used a **logistic regression classifier** with some helpful tools from scikit-learn:
-- Missing numbers in numerical features were filled in with the average, and values were scaled
-- For categorical features (like first blood), missing entries were filled with the most common value and converted into numeric form
-- I bundled everything into a pipeline, so the whole process—cleaning, transforming, and training—is done all at once
+To ensure that we are only using information available at the **time of prediction**, all features were limited to statistics recorded within the first 15 minutes of the match. This simulates a real-time prediction scenario and avoids data leakage from later events.
 
-The model was trained using **80% of the data** and tested on the remaining **20%**, while keeping the ratio of stomp vs. non-stomp games balanced. I also adjusted for the fact that stomp games are less common so that the model doesn’t just learn to predict “not a stomp” every time.
+## Baseline Model
 
-To evaluate the model, I looked at the **F1-score**, which is a good balance of precision and recall. This metric is helpful here because we care both about *correctly identifying stomp games* and *not labeling normal games as stomps by mistake*.
+For our baseline model, we used **logistic regression**, a simple but effective classification algorithm. It provides a strong starting point due to its interpretability and speed, and allows us to establish a benchmark for more complex models.
 
-Overall, this setup helps us understand whether early-game stats are strong indicators of how one-sided a match will turn out.
+### Features
+
+We used 21 input features:
+
+- **16 quantitative features**: Continuous values such as gold difference at 10 and 15 minutes, kills, assists, deaths, vision score, and damage taken per minute.
+- **5 nominal categorical features**: Binary indicators for early-game objectives like `firstblood`, `firstdragon`, `firstherald`, `firsttower`, and `result`.
+
+There are no ordinal features in this dataset.
+
+### Preprocessing
+
+We constructed a full modeling pipeline using `scikit-learn`:
+
+- **Numerical features** were imputed using their **mean** and scaled with `StandardScaler`.
+- **Categorical features** were imputed with the **most frequent** value and one-hot encoded via `OneHotEncoder`.
+
+### Model Training and Evaluation
+
+We split the dataset into training and testing sets (80/20), stratified by the target variable to preserve class balance. Since stomp games are relatively rare, we used `class_weight='balanced'` in logistic regression to account for the imbalance.
+
+After fitting the model, we evaluated its performance using the **classification report**, which includes **precision, recall, and F1-score**.
+
+
 
 
 
