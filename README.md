@@ -48,5 +48,13 @@ This plot shows the distribution of game lengths across all matches.
 </iframe>
 
 This plot shows how gold and kill counts at 15 minutes vary between stomp and non-stomp games. Stomps tend to have higher gold and kill values early on.
+### Average Combat Stats at 15 Minutes by Stomp Label
+
+|   is_stomp |   assistsat15 |   deathsat15 |   killsat15 |
+|-----------:|--------------:|-------------:|------------:|
+|          0 |          2.09 |         1.28 |        1.27 |
+|          1 |          4.73 |         3.16 |        3.37 |
+
+This pivot table shows that stomp games have significantly more kills and assists, and fewer deaths at 15 minutes. This indicates strong early momentum and dominance, consistent with the definition of a stomp.
 
 
