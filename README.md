@@ -1,6 +1,6 @@
 # How Badly Will You Lose – League of Legends  
 ### DSC 80 Final Project – Spring 2025  
-**By: Ziyan Liu
+By: Ziyan Liu
 
 ## Introduction
 
