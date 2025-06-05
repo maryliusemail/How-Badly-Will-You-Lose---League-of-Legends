@@ -10,7 +10,7 @@ The goal of this project is to predict whether a game was a “stomp” — defi
 
 To answer this question, we focus on a subset of early and mid-game features, such as gold, XP, and CS differences at 10 and 15 minutes; kills, assists, and deaths at the same intervals; early objective control (`firstblood`, `firstdragon`, `firstherald`, `firsttower`); and combat impact metrics like `visionscore`, `dpm` (damage per minute), and `damagetakenperminute`. The target column, `is_stomp`, is a binary label derived from game length, result, and gold differential at 15 minutes.
 
-## Data Cleaning 
+## Data Cleaning and Exploratory Data Analysis
 
 To get the dataset ready for analysis, I started by loading the full 2022 Oracle’s Elixir League of Legends dataset, which originally had 150,588 rows and 163 columns. From there, I narrowed it down to 23 columns that focused on early- and mid-game performance, objective control, and combat stats — the kinds of features that would matter most when trying to identify one-sided, fast-paced games (or “stomps”).
 
@@ -25,4 +25,17 @@ The last step was creating a new column called `is_stomp`, which flags whether a
 |            162 |           71 |            0 |           -475 |          153 |            1 |           0 |             1 |            0 |           0 |             3 |            0 |            0 |           nan |           nan |          nan |            29 |                581.646 | complete           |         1713 |        0 |          0 |
 |            296 |          265 |          -12 |           -793 |        -1343 |          -34 |           1 |             1 |            0 |           2 |             1 |            2 |            1 |           nan |           nan |          nan |            25 |                463.853 | complete           |         1713 |        0 |          0 |
 |            528 |         -587 |            1 |            443 |         -497 |            7 |           1 |             1 |            0 |           1 |             2 |            2 |            1 |           nan |           nan |          nan |            69 |                475.026 | complete           |         1713 |        0 |          0 |
+
+
+
+### Gold Difference at 15 Minutes – Stomp vs. Non-Stomp
+
+<iframe
+  src="assets/golddiffat15_by_stomp.html"
+  width="800"
+  height="500"
+  frameborder="0"
+></iframe>
+
+This plot compares gold difference at 15 minutes for stomp and non-stomp games. Stomp games tend to have more extreme gold differences — either large leads or large deficits — while non-stomp games cluster more around even gold states.
 
