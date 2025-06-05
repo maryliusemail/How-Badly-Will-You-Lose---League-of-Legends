@@ -57,7 +57,7 @@ This plot shows how gold and kill counts at 15 minutes vary between stomp and no
 
 This pivot table shows that stomp games have significantly more kills and assists, and fewer deaths at 15 minutes. This indicates strong early momentum and dominance, consistent with the definition of a stomp.
 
-##Assessment of Missingness
+## Assessment of Missingness
 
 ### Assessment of Missingness – NMAR Column
 
