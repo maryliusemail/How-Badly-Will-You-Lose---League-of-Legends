@@ -77,3 +77,22 @@ To possibly treat this column as **Missing At Random (MAR)** instead, I would ne
 ></iframe>
 
 The plot above shows the null distribution of the difference in mean kills at 15 minutes between games where the `firstherald` value is missing and where it is not. The observed difference (red dashed line) is **-3.259**, and the computed p-value is **0.0000**. This result suggests that the missingness of `firstherald` is not random — it likely depends on early-game performance, specifically team kills by the 15-minute mark.
+
+## Hypothesis Testing
+
+**Null Hypothesis (H₀):**  
+The distribution of game lengths is the same in games with low kill difference and high kill difference at 15 minutes.
+
+**Alternative Hypothesis (H₁):**  
+The distribution of game lengths is different in games with low kill difference and high kill difference at 15 minutes.
+
+We used a permutation test comparing the mean game length of two groups: games with a **low kill difference (< 3)** and those with a **high kill difference (≥ 3)** at 15 minutes. The observed test statistic (difference in means) was **-136.331 seconds**, and the resulting **p-value was 0.0000**.
+
+<iframe
+  src="assets/gamelength_killdiff15_permutation.html"
+  width="800"
+  height="600"
+  frameborder="0"
+></iframe>
+
+This p-value is well below the standard significance threshold of 0.05, so we **reject the null hypothesis**. This provides strong statistical evidence that early-game dominance (measured by kill difference at 15 minutes) is associated with significantly shorter game durations. In other words, early aggression often leads to quicker wins in League of Legends.
