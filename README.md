@@ -111,16 +111,16 @@ To ensure that we are only using information available at the **time of predicti
 
 ## Baseline Model
 
-For my baseline model, I used a **Logistic Regression classifier** with balanced class weights to account for the imbalance in the binary target variable `is_stomp`. The model was trained on **seven features**, categorized as follows:
+For my baseline model, I used a **Logistic Regression classifier** with balanced class weights to account for the imbalance in the binary target variable `is_stomp`. The model was trained on seven features, listed as follows:
 
-- **Quantitative features (4)**:  
+- **Quantitative features - 4 **:  
   - `golddiffat15`  
   - `killsat15`  
   - `deathsat15`  
   - `gamelength`  
   These are continuous numerical values that capture early-to-mid game combat statistics and game duration.
 
-- **Nominal categorical features (3)**:  
+- **Nominal categorical features - 3 **:  
   - `firstdragon`  
   - `firstherald`  
   - `firsttower`  
@@ -129,7 +129,7 @@ For my baseline model, I used a **Logistic Regression classifier** with balanced
 There were **no ordinal features** in this dataset.
 
 To prepare the data for modeling:
-- I applied **standard scaling** to the quantitative features using `StandardScaler`, to account for varying scales, especially due to different game lengths.
+- I applied standard scaling to the quantitative features using `StandardScaler`, to account for varying scales, especially due to different game lengths.
 - For categorical features, I used **most frequent imputation** followed by **one-hot encoding** to convert them into a numeric format suitable for the model.
 
 I trained the model on an 80/20 stratified train-test split and evaluated it using the **F1 score**, which is a better metric than accuracy for imbalanced classification problems. The **baseline model achieved an F1 score of 0.5303**. While the model shows some ability to predict “stomp” games, the relatively low F1 score suggests limited recall or precision. Therefore, I do **not consider this model to be strong**, but it provides a reasonable foundation to build upon.
@@ -138,13 +138,13 @@ I trained the model on an 80/20 stratified train-test split and evaluated it usi
 
 ## Final Model
 
-To improve upon the baseline, I engineered **two new quantitative features** based on domain knowledge from League of Legends:
+To improve upon the baseline, I engineered two new quantitative features based on domain knowledge from League of Legends:
 
-1. **`gold_per_min`**: Calculated as `golddiffat15 / gamelength`, this feature reflects how quickly a team accumulates a gold lead, regardless of game duration. This gives insight into tempo and efficiency.
+1. **`gold_per_min`**: Calculated as `golddiffat15 / gamelength`, this feature reflects how quickly a team accumulates a gold lead, regardless of game duration. This gives insight into tempo and their efficiency.
 
-2. **`kda15`**: A smoothed kill-death ratio, defined as `(killsat15 + 1) / (deathsat15 + 1)`, which captures combat efficiency while avoiding division-by-zero errors. A higher `kda15` often corresponds to strong early-game dominance.
+2. **`kda15`**: A kill-death ratio, defined as `(killsat15 + 1) / (deathsat15 + 1)`, which captures combat efficiency while avoiding division-by-zero errors. A higher `kda15` often corresponds to a stronger early game dominance.
 
-These features were chosen not based on post-hoc performance, but because they reflect **meaningful, game-driven dynamics**: faster gold accumulation and better combat stats are both key indicators of a game being a "stomp."
+These features were chosen because they reflect capture meaningful elements of the game. Faster gold accumulation and better combat stats are both key indicators of a game being a "stomp."
 
 For the final model, I used a **Random Forest Classifier**, which is well-suited to capturing non-linear interactions between variables. I used a pipeline that applied:
 
@@ -154,7 +154,7 @@ For the final model, I used a **Random Forest Classifier**, which is well-suited
 
 ### Hyperparameter Tuning
 
-To optimize the model, I used **GridSearchCV** with 5-fold cross-validation, testing combinations of:
+To optimize the model, I used GridSearchCV with 5-fold cross-validation, testing combinations of:
 
 - `n_estimators`: [50, 100, 150]
 - `max_depth`: [5, 10, 20, None]
@@ -165,8 +165,7 @@ The best hyperparameters found were:
 
 ### Final Model Performance
 
-Using these hyperparameters, the **final model achieved an F1 score of 0.9902** on the same test set as the baseline. This is a **dramatic improvement** over the baseline score of 0.5303, showing that thoughtful feature engineering and a more flexible model architecture significantly enhanced the predictive performance.
-
+Using these hyperparameters, the final model achieved an **F1 score of 0.9902** on the same test set as the baseline. This is a big improvement over the baseline score of 0.5303!
 
 
 
