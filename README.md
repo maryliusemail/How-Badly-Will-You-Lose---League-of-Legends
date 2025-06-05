@@ -96,3 +96,39 @@ We used a permutation test comparing the mean game length of two groups: games w
 ></iframe>
 
 This p-value is well below the standard significance threshold of 0.05, so we **reject the null hypothesis**. This provides strong statistical evidence that early-game dominance (measured by kill difference at 15 minutes) is associated with significantly shorter game durations. In other words, early aggression often leads to quicker wins in League of Legends.
+
+## Framing a Prediction Problem
+The goal of this project is to **predict whether a League of Legends match is a "stomp"** using early- and mid-game statistics. A *stomp* is defined as a game that ends in under 25 minutes (1500 seconds) where the winning team had a gold lead of at least 1500 at the 15-minute mark.
+
+This is a **binary classification problem**, and the **response variable** is:
+
+- `is_stomp`:  
+  - `1` if the game was a stomp  
+  - `0` otherwise
+
+We chose this prediction target because stomped games represent highly unbalanced matches and early indicators of such games can reveal valuable patterns about how early momentum translates into game outcomes.
+
+The **features** used for prediction include:
+- Differences in team stats at 10 and 15 minutes:  
+  - Gold, experience, CS, kills, assists, deaths
+- Objective control:  
+  - Whether the team secured first blood, first dragon, first herald, or first tower
+- Combat metrics:  
+  - Team damage dealt, vision score
+- Other:  
+  - Game length, match result
+
+We ensure that all features used for prediction are observable **before or at 15 minutes**, which respects the "time of prediction" principle—i.e., we are not using information that would only be known after the point we are trying to make a prediction.
+
+The **evaluation metric** we selected is **F1-score**, which balances precision and recall. This is especially important here because:
+- Stomp games are relatively rare compared to non-stomp games (i.e., class imbalance),
+- We care not only about correctly identifying stomp games (recall), but also about minimizing false positives (precision).
+
+By using the F1-score, we aim to build a model that effectively identifies stomp games without over-predicting them.
+
+
+
+
+
+
+
