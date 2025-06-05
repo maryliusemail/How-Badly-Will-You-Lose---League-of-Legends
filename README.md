@@ -111,22 +111,61 @@ To ensure that we are only using information available at the **time of predicti
 
 ## Baseline Model
 
-For my baseline model, I used a **Logistic Regression** classifier with balanced class weights to address the class imbalance in the target variable. The model was trained on seven features: `golddiffat15`, `killsat15`, `deathsat15`, `firstdragon`, `firstherald`, `firsttower`, and `gamelength`. The first four features are quantitative and were standardized using `StandardScaler` to ensure consistent scaling, particularly since game durations can vary significantly. The last three features are binary categorical variables that capture key in-game objectives, and they were one-hot encoded after imputing missing values with the most frequent category.
+For my baseline model, I used a **Logistic Regression classifier** with balanced class weights to account for the imbalance in the binary target variable `is_stomp`. The model was trained on **seven features**, categorized as follows:
 
-To improve upon this baseline, I plan to experiment with different types of models such as **Random Forests**, **Gradient Boosting**, and other **ensemble methods** to better capture non-linear relationships and improve overall predictive performance.
+- **Quantitative features (4)**:  
+  - `golddiffat15`  
+  - `killsat15`  
+  - `deathsat15`  
+  - `gamelength`  
+  These are continuous numerical values that capture early-to-mid game combat statistics and game duration.
 
+- **Nominal categorical features (3)**:  
+  - `firstdragon`  
+  - `firstherald`  
+  - `firsttower`  
+  These are binary indicators representing whether the team secured key objectives.
+
+There were **no ordinal features** in this dataset.
+
+To prepare the data for modeling:
+- I applied **standard scaling** to the quantitative features using `StandardScaler`, to account for varying scales, especially due to different game lengths.
+- For categorical features, I used **most frequent imputation** followed by **one-hot encoding** to convert them into a numeric format suitable for the model.
+
+I trained the model on an 80/20 stratified train-test split and evaluated it using the **F1 score**, which is a better metric than accuracy for imbalanced classification problems. The **baseline model achieved an F1 score of 0.5303**. While the model shows some ability to predict “stomp” games, the relatively low F1 score suggests limited recall or precision. Therefore, I do **not consider this model to be strong**, but it provides a reasonable foundation to build upon.
+
+---
 
 ## Final Model
 
-In my final model, I used a **Random Forest Classifier** to improve upon the baseline logistic regression model. I kept the same set of seven features: `golddiffat15`, `killsat15`, `deathsat15`, `firstdragon`, `firstherald`, `firsttower`, and `gamelength`. These features were selected because they reflect both early and mid-game performance, as well as objective control, all of which are important indicators of whether a match is a “stomp.” The quantitative features were standardized using `StandardScaler`, and the categorical features were one-hot encoded after imputation.
+To improve upon the baseline, I engineered **two new quantitative features** based on domain knowledge from League of Legends:
 
-Compared to logistic regression, Random Forest offers the ability to model complex, non-linear relationships and interactions between features, making it a strong choice for capturing the dynamics of League of Legends matches. To ensure robustness, I used class-balanced weighting and left the default number of trees at 100, with a fixed random state to ensure reproducibility.
+1. **`gold_per_min`**: Calculated as `golddiffat15 / gamelength`, this feature reflects how quickly a team accumulates a gold lead, regardless of game duration. This gives insight into tempo and efficiency.
 
-After training the model on an 80/20 stratified split and evaluating it on the test set, my final model achieved an **F1 score of 0.9907**. This represents a substantial improvement over the baseline model’s F1 score of **0.5295**, indicating that the Random Forest classifier is highly effective at capturing the underlying patterns in the data. Both precision and recall are near perfect, suggesting that the model performs exceptionally well in identifying “stomp” games with very few false positives or false negatives.
+2. **`kda15`**: A smoothed kill-death ratio, defined as `(killsat15 + 1) / (deathsat15 + 1)`, which captures combat efficiency while avoiding division-by-zero errors. A higher `kda15` often corresponds to strong early-game dominance.
 
-This performance demonstrates that switching to a more powerful model, even without adding new features or tuning hyperparameters extensively, can yield dramatic gains in predictive power.
+These features were chosen not based on post-hoc performance, but because they reflect **meaningful, game-driven dynamics**: faster gold accumulation and better combat stats are both key indicators of a game being a "stomp."
 
+For the final model, I used a **Random Forest Classifier**, which is well-suited to capturing non-linear interactions between variables. I used a pipeline that applied:
 
+- **Standard scaling** for the original quantitative features (`golddiffat15`, `killsat15`, `deathsat15`)
+- **Quantile transformation** (to normalize skew) for the engineered features (`gold_per_min`, `kda15`) and `gamelength`
+- **One-hot encoding** for the categorical features (`firstdragon`, `firstherald`, `firsttower`) after imputing missing values
+
+### Hyperparameter Tuning
+
+To optimize the model, I used **GridSearchCV** with 5-fold cross-validation, testing combinations of:
+
+- `n_estimators`: [50, 100, 150]
+- `max_depth`: [5, 10, 20, None]
+
+The best hyperparameters found were:
+- `n_estimators = 50`
+- `max_depth = 10`
+
+### Final Model Performance
+
+Using these hyperparameters, the **final model achieved an F1 score of 0.9902** on the same test set as the baseline. This is a **dramatic improvement** over the baseline score of 0.5303, showing that thoughtful feature engineering and a more flexible model architecture significantly enhanced the predictive performance.
 
 
 
