@@ -59,7 +59,7 @@ This pivot table shows that stomp games have significantly more kills and assist
 
 ## Assessment of Missingness
 
-### Assessment of Missingness – NMAR Column
+### NMAR Column
 
 Yes, I believe the column `firstherald` in my dataset is **Not Missing At Random (NMAR)**. The missingness of this column appears to be tied to how the game was played. Specifically, matches where `firstherald` is missing often have fewer kills by 15 minutes, suggesting a slower-paced or less aggressive early game. This implies that no team may have attempted to take the Rift Herald, and therefore the data was never recorded.
 
