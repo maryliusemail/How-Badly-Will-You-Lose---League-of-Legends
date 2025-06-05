@@ -38,4 +38,15 @@ The last step was creating a new column called `is_stomp`, which flags whether a
 
 This plot shows the distribution of game lengths across all matches.
 
+### Gold vs. Kills at 15 Minutes – Stomp Comparison
+
+<iframe
+  src="assets/gold_kills_by_stomps.html"
+  width="800"
+  height="500"
+  frameborder="0">
+</iframe>
+
+This plot shows how gold and kill counts at 15 minutes vary between stomp and non-stomp games. Stomps tend to have higher gold and kill values early on.
+
 
