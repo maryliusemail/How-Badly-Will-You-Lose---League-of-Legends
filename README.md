@@ -177,7 +177,7 @@ To improve the model’s predictive performance, I engineered two new features:
 
 ### Feature Types and Encodings
 
-The final model used a total of **20 features**, including:
+The final model used was a `RandomForestClassifier` with a  total of **20 features**, including:
 
 - **Quantitative features (17)**:
   - These include standard early-game metrics such as `golddiffat10`, `xpdiffat10`, `visionscore`, as well as the two engineered features: `gold_per_minute` and `kda_15`.
@@ -192,9 +192,9 @@ There were no ordinal features in this dataset.
 
 ---
 
-### Modeling Algorithm and Hyperparameter Tuning
+### Hyperparameters
 
-The final model used was a `RandomForestClassifier`. I used **GridSearchCV** with 5-fold cross-validation to select the best combination of hyperparameters:
+I used **GridSearchCV** with 5-fold cross-validation to select the best combination of hyperparameters:
 
 - `n_estimators`: [50, 100]
 - `max_depth`: [10, 20, None]
@@ -205,7 +205,7 @@ The final model used was a `RandomForestClassifier`. I used **GridSearchCV** wit
 - `max_depth = 10`
 - `min_samples_split = 5`
 
-These hyperparameters offered the best trade-off between underfitting and overfitting based on cross-validation F1 score.
+These hyperparameters offered the best trade-off between underfitting and overfitting based on the cross-validation F1 score.
 
 
 ### Performance Comparison
