@@ -171,70 +171,54 @@ Accuracy: 0.6844
 
 F1 Score: 0.6653
 
-Assessment
+Good/Bad?
 This baseline model serves as a good starting point. While Logistic Regression is a simple linear model, it performs reasonably well here. The use of a balanced dataset and F1 score for evaluation helps avoid misleading accuracy metrics and gives a clearer view of performance on both classes.
 
 
 ## Final Model
 
-For my final model, I used a Random Forest Classifier to predict whether a game is a stomp — defined as a match ending in under 25 minutes with a gold lead of at least 1500 for the winning team at the 15-minute mark. This is a binary classification task where the target variable is is_stomp, and the goal is to identify games that end in decisive wins based on early indicators. I selected a Random Forest Classifier due to its ability to model nonlinear relationships and handle complex feature and their interactions.
+For my final model, I used a **Random Forest Classifier**. I created a **balanced dataset** by sampling the same number of stomp and non-stomp games (5,346 each) to make the model focus equally on both classes.
 
-As in the baseline model, I first created a balanced dataset by sampling an equal number of stomp (1) and non-stomp (0) games (5,346 of each). This ensures the model is not biased toward predicting the majority class and learns meaningful distinctions between the two outcomes.
 
-Features Added and Why
-To improve model performance, I engineered two new features designed to capture important game dynamics:
+### Features Added and Why
 
-gold_per_minute_15: This is the gold differential at 15 minutes divided by 900 seconds (15 minutes). It captures the pace of economic dominance, which is a hallmark of stomp games.
+I added two new features based on game knowledge:
 
-kda_15: Calculated as (killsat15 + assistsat15 + 1) / (deathsat15 + 1), this metric reflects early-game combat effectiveness. Higher values suggest early dominance and survivability, which often translate into faster wins.
+- `gold_per_minute_10`: Measures how quickly a team gains gold in the first 10 minutes. Faster gold gain often means early dominance, which can lead to a stomp. This helps the model in predicting how fast a stomped vs non-stomped team is accumlating gold within the first ten mins.
+- `kda_15`: Combines kills, assists, and deaths at 15 minutes to show how well a team is doing in early fights. High KDA usually means strong early advantage. This ratio is important in giving more context to the kills 
 
-Feature Types and Encodings
-The model used 13 total features, including:
+These features help identify early leads and team strength, which are key to predicting stomps.
 
-Quantitative (10):
-- golddiffat10, csdiffat10, xpdiffat15, killsat15, deathsat15, gold_per_minute_15, and kda_15.
 
-Preprocessing for Quantitative columns:
+### Features and Encoding
 
-StandardScaler was applied to standard in-game metrics that could be very large or small (golddiffat10','csdiffat10', 'xpdiffat15', 'csdiffat15').
+The model used 12 features:
 
-QuantileTransformer was used on the engineered features to handle a possibly skewed distributions ('gold_per_minute_15', 'kda_15').
+- **Numerical features (9)**:
+  - `StandardScaler` was used for common stats that could have different scales (in the thousands while kills are not).
+  - `QuantileTransformer` was applied to engineered features to reduce possilby skewness (there mgiht be teams without kills or without deaths).
 
-Nominal Categorical (3):
+- **Categorical features (3)**:
+  - `side`, `patch`, and `playoffs`, encoded with `OneHotEncoder`.
 
-- side, patch, and playoffs.
+### Model and Hyperparameters
 
-Preprocessing:
-Encoded using OneHotEncoder.
+I used `GridSearchCV` with 5-fold cross-validation to find the best settings within:
+    `classifier__n_estimators`: [50, 100],
+    `classifier__max_depth`: [10, 20, None],
+    `classifier__min_samples_split`: [2, 5]
+    
+The final parameters were:
+  - `n_estimators = 100`
+  - `max_depth = 20`
+  - `min_samples_split = 5`
 
-There were no ordinal features in this dataset.
+### Model Performance vs Basline
 
-Hyperparameter Tuning
-To optimize model performance, I used GridSearchCV with 5-fold cross-validation to search over the following parameters:
+  - `Accuracy`: 0.8139  
+  - `F1 Score`: 0.8188
 
-n_estimators: [50, 100]
-
-max_depth: [10, 20, None]
-
-min_samples_split: [2, 5]
-
-Best Parameters Found:
-
-n_estimators = 100
-
-max_depth = 10
-
-min_samples_split = 5
-
-These settings are the best model that balances complexity and generalization, based on F1 score.
-
-Performance Comparison
-Model	Accuracy	F1 Score
-Logistic Regression (Baseline)	0.6844	0.6653
-Random Forest (Final)	0.9107	0.9170
-
-The Random Forest model significantly outperformed the baseline in both accuracy and F1 score. The improved F1 score reflects the model’s better balance of precision and recall, meaning it more reliably detects stomp games without overpredicting them.
-
+Compared to the baseline model, this is a significant improvement! The added features better capture early dominance patterns that lead to stomps, and the Random Forest model capitalizes on nonlinear interactions across features. The higher F1 score also means that the model is better at correctly identifying both classes, better balancing precision (how many predicted positives are actually correct) and recall (how many actual positives the model catches). 
 
 ## Fairness Analysis
 
