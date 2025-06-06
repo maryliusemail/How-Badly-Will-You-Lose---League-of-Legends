@@ -190,7 +190,6 @@ The final model used was a `RandomForestClassifier` with a  total of **20 featur
 
 There were no ordinal features in this dataset.
 
----
 
 ### Hyperparameters
 
