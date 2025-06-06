@@ -1,4 +1,4 @@
-# How Badly Will You Lose – League of Legends  
+# Predicting if the game was a STOMP
 ### DSC 80 Final Project – Spring 2025  
 By: Ziyan Liu
 
