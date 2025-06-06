@@ -69,9 +69,9 @@ To possibly treat this column as **Missing At Random (MAR)** instead, I would ne
 
 ### Permutation Test: Kills at 15 Minutes vs. First Herald Missingness
 
-- Null Hypothesis (H₀): The missingness in `firstherald` is not associated with `killsat15`; any observed difference is due to chance.
+- `Null Hypothesis` (H₀): The missingness in `firstherald` is not associated with `killsat15`; any observed difference is due to chance.
 
-- Alternative Hypothesis (H₁): The missingness in `firstherald` is associated with `killsat15`; the observed difference is unlikely to be due to chance.
+- `Alternative Hypothesis` (H₁): The missingness in `firstherald` is associated with `killsat15`; the observed difference is unlikely to be due to chance.
 
 <iframe
   src="assets/firstherald_missingness_test.html"
@@ -84,9 +84,9 @@ The plot above shows the null distribution of the difference in mean kills at 15
 
 ### Permutation Test: Result vs. First Herald Missingness
 
-- Null Hypothesis (H₀): The missingness in `firstherald` is not associated with `result`; any observed difference in win rate is due to chance.
+- `Null Hypothesis` (H₀): The missingness in `firstherald` is not associated with `result`; any observed difference in win rate is due to chance.
 
-- Alternative Hypothesis (H₁): The missingness in `firstherald` is associated with `result`; the observed difference in win rate is unlikely to be due to chance.
+- `Alternative Hypothesis` (H₁): The missingness in `firstherald` is associated with `result`; the observed difference in win rate is unlikely to be due to chance.
 
 <iframe
   src="assets/result_vs_firstherald_missingness.html"
@@ -99,10 +99,10 @@ The plot above shows the null distribution of the difference in mean match outco
 
 ## Hypothesis Testing
 
-**Null Hypothesis (H₀):**  
+`Null Hypothesis (H₀):` 
 The distribution of game lengths is the same in games with low kill difference and high kill difference at 15 minutes.
 
-**Alternative Hypothesis (H₁):**  
+`Alternative Hypothesis (H₁):` 
 The distribution of game lengths is different in games with low kill difference and high kill difference at 15 minutes.
 
 
@@ -123,11 +123,10 @@ We find strong evidence to reject the null hypothesis. Games with a high kill di
 
 The goal of this project is to build a binary classification model that predicts whether a League of Legends game is a stomp, based on early- and mid-game statistics. A stomp is defined as a game that ends quickly (under 25 minutes) where one team decisively wins or loses horribly—characterized by both a significant gold differential at the 15-minute mark and a short game duration.
 
-The response variable is is_stomp, a binary label:
+The response variable is `is_stomp`, a binary label:
 
-1 indicates the game was a stomp
-
-0 indicates it was not a stomp
+  - 1 indicates the game was a stomp
+  - 0 indicates it was not a stomp
 
 I chose is_stomp as the target because it captures extreme, one-sided games that can be used to see important large skill differences or lack of preparedness, making easy to see if there might be an unfair match up between a strong and expereince pro team vs a beginner or weak pro team.
 
@@ -140,38 +139,32 @@ For my baseline model, I used a Logistic Regression classifier. This is a binary
 Dataset Balancing
 To ensure the model had equal exposure to both outcomes, I constructed a balanced dataset by sampling an equal number of stomp (is_stomp = 1) and non-stomp (is_stomp = 0) games—5,346 of each. This prevents the model from being biased toward the majority class and enables better evaluation using metrics like the F1 score.
 
-Features Used
+### Features Used
 The model uses a total of 6 features, including:
 
 3 quantitative (numerical):
 
-golddiffat10: Gold difference at 10 minutes
-
-csdiffat15: CS difference at 15 minutes
-
-killsat15: Kills at 15 minutes
+  - `golddiffat10`: Gold difference at 10 minutes
+  - `csdiffat15`: CS difference at 15 minutes
+  - `killsat15`: Kills at 15 minutes
 
 3 nominal (categorical):
 
-side: Whether the team was Blue or Red
-
-patch: Version of the game patch
-
-playoffs: Whether the match occurred during playoffs
+  - `side`: Whether the team was Blue or Red
+  - `patch`: Version of the game patch
+  - `playoffs`: Whether the match occurred during playoffs
 
 There are no ordinal features in this setup.
 
-Encodings and Preprocessing
-- Numerical features were standardized using StandardScaler.
+### Encodings and Preprocessing
+  - `Numerical features` were standardized using StandardScaler.
+  - `Categorical features` were encoded using OneHotEncoder.
 
-- Categorical features were encoded using OneHotEncoder.
+### Model Performance
+  - Accuracy: 0.6844
+  - F1 Score: 0.6653
 
-Model Performance
-Accuracy: 0.6844
-
-F1 Score: 0.6653
-
-Good/Bad?
+### Good/Bad?
 This baseline model serves as a good starting point. While Logistic Regression is a simple linear model, it performs reasonably well here. The use of a balanced dataset and F1 score for evaluation helps avoid misleading accuracy metrics and gives a clearer view of performance on both classes.
 
 
@@ -179,26 +172,24 @@ This baseline model serves as a good starting point. While Logistic Regression i
 
 For my final model, I used a **Random Forest Classifier**. I created a **balanced dataset** by sampling the same number of stomp and non-stomp games (5,346 each) to make the model focus equally on both classes.
 
-
 ### Features Added and Why
 
 I added two new features based on game knowledge:
 
 - `gold_per_minute_10`: Measures how quickly a team gains gold in the first 10 minutes. Faster gold gain often means early dominance, which can lead to a stomp. This helps the model in predicting how fast a stomped vs non-stomped team is accumlating gold within the first ten mins.
-- `kda_15`: Combines kills, assists, and deaths at 15 minutes to show how well a team is doing in early fights. High KDA usually means strong early advantage. This ratio is important in giving more context to the kills 
+- `kda_15`: Combines kills, assists, and deaths at 15 minutes to show how well a team is doing in early fights. High KDA usually means strong early advantage. This ratio is important in giving more context to the kills or deaths recieved. For exmaple, a high death isn't bad if they get the same or greater number of kills/assists.
 
-These features help identify early leads and team strength, which are key to predicting stomps.
-
+These features help identify early leads and team strength, which are useful for predicting stomps.
 
 ### Features and Encoding
 
 The model used 12 features:
 
-- **Numerical features (9)**:
+- `Numerical features` (9):
   - `StandardScaler` was used for common stats that could have different scales (in the thousands while kills are not).
   - `QuantileTransformer` was applied to engineered features to reduce possilby skewness (there mgiht be teams without kills or without deaths).
 
-- **Categorical features (3)**:
+- `Categorical features` (3):
   - `side`, `patch`, and `playoffs`, encoded with `OneHotEncoder`.
 
 ### Model and Hyperparameters
@@ -222,29 +213,26 @@ Compared to the baseline model, this is a significant improvement! The added fea
 
 ## Fairness Analysis
 
-To evaluate the fairness of my Final Model, I examined whether the model performs differently for two groups based on early-game objective control:
+### Group Definitions
+- **Group X**: Games where `playoffs == 0` (regular season)
+- **Group Y**: Games where `playoffs == 1` (playoff matches)
 
-- **Group X**: Teams that did *not* secure the first dragon (`firstdragon = 0`)
-- **Group Y**: Teams that *did* secure the first dragon (`firstdragon = 1`)
-
-I chose **precision** as the evaluation metric, as it reflects how often the model is correct when it predicts a "stomp" — which is especially important when such predictions may influence decision-making or further analysis.
+### Evaluation Metric
+We used `precision` as the evaluation metric to assess how accurately the model predicts stomp games for each group.
 
 ### Hypotheses
+- `Null Hypothesis` (H₀): There is no difference in precision between playoff and non-playoff games.
+- `Alternative Hypothesis` (H₁): There is a difference in precision between the two groups.
 
-- **Null Hypothesis (H₀)**: The model is fair. Precision is equal for both groups (dragon or no dragon), and any observed difference is due to chance.
-- **Alternative Hypothesis (H₁)**: The model is unfair. Precision is lower for teams that did **not** secure first dragon (Group X).
+### Test Statistic and Method
+We calculated the  `observed precision difference` between Group Y and Group X, then used a permutation test (1,000 permutations) where the `playoffs` labels were shuffled. The test statistic is the `difference in precision` between the two groups.
 
-### Method
+- `Observed Precision Difference`: 0.0000  
+- `P-value`: 0.4930  
+- `Significance Level`: α = 0.05
 
-Using the final fitted Random Forest model (`n_estimators = 50`, `max_depth = 10`), I predicted outcomes on the held-out test set. I computed the **precision** separately for Group X and Group Y, and then ran a **permutation test with 1000 iterations**. In each iteration, I shuffled the group assignments and recalculated the difference in precision between the two groups.
-
-### Results and Conclusion
-
-- Observed Precision Difference (Y - X): 0.0000
-  
-- P-value: 0.7610
-
-The fairness analysis shows that the precision of the model is nearly identical between teams that secured the first dragon and those that did not. With an observed precision difference of 0.0000 and a p-value of 0.7610, we fail to reject the null hypothesis. This means we do not have sufficient evidence to conclude that the model is unfair. The results suggest that the final Random Forest model treats both groups fairly with respect to the firstdragon feature.
+### Conclusion
+Since the p-value (0.4930) is greater than the significance level (0.05), we **fail to reject the null hypothesis**. This suggests that there is **no statistically significant difference** in the model’s precision between playoff and non-playoff games. Meaning that the model is fair for these groups.
 
 
 
