@@ -47,13 +47,15 @@ This plot shows the distribution of game lengths (in seconds) across all matches
 This scatter plot shows the relationship between gold difference and kills at 15 minutes, with color indicating whether the match was a stomp. There is a strong positive correlation between early gold and kill leads, and stomp games (in yellow) tend to cluster at the extremes.
 
 ### Average Combat Stats at 15 Minutes by Stomp Label
+The table below shows the average number of kills, deaths, and assists at 15 minutes, grouped by whether the game was classified as a stomp or not.
+
 
 |   is_stomp |   assistsat15 |   deathsat15 |   killsat15 |
 |-----------:|--------------:|-------------:|------------:|
 |          0 |          2.09 |         1.28 |        1.27 |
 |          1 |          4.73 |         3.16 |        3.37 |
 
-This pivot table shows that stomp games have significantly more kills and assists, and fewer deaths at 15 minutes. This indicates strong early momentum and dominance, consistent with the definition of a stomp.
+Teams in stomp games average significantly more kills (3.37 vs. 1.27), assists (4.73 vs. 2.09), and deaths (3.16 vs. 1.28) by the 15-minute mark. This suggests that stomp games are characterized by agression and combat, reinforcing the idea that winning early flights strongly contribute to snowballing advantages then winning.
 
 ## Assessment of Missingness
 
