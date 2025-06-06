@@ -61,13 +61,13 @@ Teams in stomp games average significantly more kills (3.37 vs. 1.27), assists (
 
 ### NMAR Column
 
-Yes, I believe the column `firstherald` in my dataset is **Not Missing At Random (NMAR)**. When firstherald is 1, the team secured the Rift Herald; 0 means the opponent did. If the value is missing (NaN), it's likely because no team secured the Herald. The missingness of this column appears to be tied to how the game was played. Specifically, matches where `firstherald` is missing often have fewer kills by 15 minutes, suggesting a slower-paced and less aggressive early game. This implies that no team may have attempted to take the Rift Herald, and therefore the data was never recorded. 
+I do not believe that any columns in the dataset are Not Missing At Random (NMAR). NMAR would imply that the likelihood of a value being missing is directly related to the missing value itself, which doesn’t appear to be the case in this dataset.
 
-Since the missingness seems related to in-game behavior—such as early-game tempo and agression and is not due to random error or chance, but rather tied to unobserved player decisions, which is why I classify it as NMAR.
+However, the column firstherald is a good example of data that is Missing by Design (MD). Its values are often missing because neither team secured the Rift Herald, so no value was recorded. However, it may also be considered Missing At Random (MAR) since the missingness could depend on other observed variables like killsat15, which is an indication of agressive playstyle that includes grabing the Rift Herlad. For example, games with missing firstherald values tend to have fewer early kills, suggesting a less aggressive playstyle or slower early tempo that results in teams not tryign to grab the Herald.
 
-To possibly treat this column as **Missing At Random (MAR)** instead, I would need more context. For instance, knowing whether the Herald spawned at all, whether teams moved toward the objective, or if the game ended before it became relevant to have a herald could help explain the missingness based on observed variables. With those extra information, we can potentially treat it as Missing At Random,
+If additional context—like whether the Herald spawned or how teams moved around objectives—were available, it could further support treating the missingness in firstherald as MAR. But as for NMAR, there's no evidence that the missingness depends on the unobserved value itself, which is why I do not classify it as NMAR.
 
-### Permutation Test: Kills at 15 Minutes vs. First Herald Missingness
+### Permutation Test: Does First Herald Missingness depend on Kills at 15 Minutes?
 
 - `Null Hypothesis` (H₀): The missingness in `firstherald` is not associated with `killsat15`; any observed difference is due to chance.
 
@@ -82,7 +82,7 @@ To possibly treat this column as **Missing At Random (MAR)** instead, I would ne
 
 The plot above shows the null distribution of the difference in mean kills at 15 minutes between games where the `firstherald` value is missing and where it is not. The observed difference (red dashed line) is **-3.259**, and the computed p-value is **0.0000**. This result suggests that the missingness of `firstherald` is not random — it likely depends on early-game performance, specifically team kills by the 15-minute mark.
 
-### Permutation Test: Result vs. First Herald Missingness
+### Does First Herald Missingness depend on the result of the game>
 
 - `Null Hypothesis` (H₀): The missingness in `firstherald` is not associated with `result`; any observed difference in win rate is due to chance.
 
