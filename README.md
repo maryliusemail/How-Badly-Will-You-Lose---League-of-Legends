@@ -117,19 +117,22 @@ The observed difference in mean game length was -136.332 seconds, and the p-valu
   frameborder="0"
 ></iframe>
 
-We find strong evidence to reject the null hypothesis. Games with a high kill difference at 15 minutes tend to be significantly shorter than games with a low kill difference. This result suggests that early-game combat dominance is associated with faster game conclusions. However, as this is an observational analysis and not a randomized experiment, we cannot claim a causal relationship a strong association.
+We find strong evidence to reject the null hypothesis. Games with a high kill difference at 15 minutes tend to be significantly shorter than games with a low kill difference. This result suggests that early-game combat dominance is associated with faster game conclusions. However, as this is an observational analysis and not a randomized experiment, we cannot claim a causal relationship.
 
 ## Framing a Prediction Problem
 
-The goal of this project is to predict whether a professional League of Legends game is a "stomp" based on early- and mid-game statistics. A **stomp** is defined as a game that lasts less than 25 minutes (1500 seconds) and where the winning team has a gold lead of at least 1500 at 15 minutes, or the losing team has a deficit of at least 1500 gold at the same time.
+The goal of this project is to build a binary classification model that predicts whether a League of Legends game is a stomp, based on early- and mid-game statistics. A stomp is defined as a game that ends quickly (under 25 minutes) where one team decisively wins or loses horribly—characterized by both a significant gold differential at the 15-minute mark and a short game duration.
 
-This is a **binary classification problem**, where the target variable is `is_stomp`:
-- `1` indicates the game was a stomp
-- `0` indicates it was not
+The response variable is is_stomp, a binary label:
 
-I chose this variable because stomp games highlight major differences in early-game performance and can offer insight into dominant playstyles or major skill differences. Predicting them using early indicators could also help coaches or broadcasters understand which games are likely to snowball out of control.
+1 indicates the game was a stomp
 
-To ensure that I am only using information available at the **time of prediction**, all features were limited to statistics recorded within the first 15 minutes of the match. 
+0 indicates it was not a stomp
+
+I chose is_stomp as the target because it captures extreme, one-sided games that can be used to see important large skill differences or lack of preparedness, making easy to see if there might be an unfair match up between a strong and expereince pro team vs a beginner or weak pro team.
+
+To evaluate the model, I want to use the F1 score, which balances precision and recall. F1 is particularly suitable for this task because stomps are relatively rare in the dataset. Unlike accuracy, which can be misleading when classes are imbalanced, F1 ensures that the model is effectively identifying both stomp and non-stomp games.
+
 
 ## Baseline Model
 For my baseline model, I used a **Logistic Regression classifier** with balanced class weights to account for the severe class imbalance in the binary target variable `is_stomp`. The model was trained on five features selected for their potential to capture early game advantages:
