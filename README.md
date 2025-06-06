@@ -121,73 +121,104 @@ We find strong evidence to reject the null hypothesis. Games with a high kill di
 
 ## Framing a Prediction Problem
 
-The goal of this project is to **predict whether a professional League of Legends game is a "stomp"** based on early- and mid-game statistics. A **stomp** is defined as a game that lasts less than 25 minutes (1500 seconds) and where the winning team has a gold lead of at least 1500 at 15 minutes, or the losing team has a deficit of at least 1500 gold at the same time.
+The goal of this project is to predict whether a professional League of Legends game is a "stomp" based on early- and mid-game statistics. A **stomp** is defined as a game that lasts less than 25 minutes (1500 seconds) and where the winning team has a gold lead of at least 1500 at 15 minutes, or the losing team has a deficit of at least 1500 gold at the same time.
 
 This is a **binary classification problem**, where the target variable is `is_stomp`:
 - `1` indicates the game was a stomp
 - `0` indicates it was not
 
-We chose this variable because stomp games highlight major disparities in early-game performance and can offer insight into dominant playstyles. Predicting them using early indicators could help coaches, analysts, or broadcasters understand which games are likely to snowball out of control.
+I chose this variable because stomp games highlight major differences in early-game performance and can offer insight into dominant playstyles or major skill differences. Predicting them using early indicators could also help coaches or broadcasters understand which games are likely to snowball out of control.
 
-To ensure that we are only using information available at the **time of prediction**, all features were limited to statistics recorded within the first 15 minutes of the match. 
+To ensure that I am only using information available at the **time of prediction**, all features were limited to statistics recorded within the first 15 minutes of the match. 
 
 ## Baseline Model
+For my baseline model, I used a **Logistic Regression classifier** with balanced class weights to account for the severe class imbalance in the binary target variable `is_stomp`. The model was trained on five features selected for their potential to capture early game advantages:
 
-For my baseline model, I used a **Logistic Regression classifier** with balanced class weights to account for the imbalance in the binary target variable `is_stomp`. The model was trained on seven features, listed as follows:
-
-- **Quantitative features - 4 **:  
-  - `golddiffat15`  
+- **Quantitative features – 3**:  
+  - `golddiffat10`  
+  - `csdiffat15`  
   - `killsat15`  
-  - `deathsat15`  
-  - `gamelength`  
-  These are continuous numerical values that capture early-to-mid game combat statistics and game duration.
+  These continuous numerical features represent early economic and combat leads that could signal a snowballing game.
 
-- **Nominal categorical features - 3 **:  
-  - `firstdragon`  
+- **Nominal categorical features – 2**:  
   - `firstherald`  
-  - `firsttower`  
-  These are binary indicators representing whether the team secured key objectives.
+  - `firstdragon`  
+  These are binary indicators that reflect whether the team secured key early-game objectives.
 
-There were **no ordinal features** in this dataset.
+There were no ordinal features used in this model.
 
-To prepare the data for modeling:
-- I applied standard scaling to the quantitative features using `StandardScaler`, to account for varying scales, especially due to different game lengths.
-- For categorical features, I used **most frequent imputation** followed by **one-hot encoding** to convert them into a numeric format suitable for the model.
+To prepare the data:
+- I **dropped rows with missing values in categorical features** to ensure clean encodings.
+- I applied **mean imputation and standard scaling** (`StandardScaler`) to the quantitative features to normalize their ranges.
+- For the categorical features, I used **one-hot encoding** with `handle_unknown='ignore'` to convert them into a machine-readable format.
 
-I trained the model on an 80/20 stratified train-test split and evaluated it using the **F1 score**, which is a better metric than accuracy for imbalanced classification problems. The **baseline model achieved an F1 score of 0.5303**. While the model shows some ability to predict “stomp” games, the relatively low F1 score suggests limited recall or precision. Therefore, I do **not consider this model to be strong**, but it provides a reasonable foundation to build upon.
+I split the dataset using an 80/20 **stratified train-test split** to preserve class proportions. The model was evaluated using both **accuracy** and **F1 score**:
 
----
+- **Accuracy**: 0.8867  
+- **F1 Score**: 0.0082
+
+While the model achieved high accuracy, this is misleading due to the imbalance of the target variable. The extremely low F1 score indicates that the model performs poorly at identifying the minority class (`is_stomp = 1`). The F1 score is used to validate it because it balances precision and recall, making it ideal for evaluating models on imbalanced classification tasks. Therefore, I do **not consider this model to be good**, but it serves as a baseline for further improvement.
+
+
 
 ## Final Model
 
-To improve upon the baseline, I engineered two new quantitative features based on domain knowledge from League of Legends:
+For my final model, I used a **Random Forest Classifier** with balanced class weights to account for the strong class imbalance in the binary target variable `is_stomp`. This model is well-suited for classifications, especially in cases with complex feature interactions and imbalanced classes. It was selected due to its ability to capture nonlinear patterns and dependencies between features, which is important in this case.
 
-1. **`gold_per_min`**: Calculated as `golddiffat15 / gamelength`, this feature reflects how quickly a team accumulates a gold lead, regardless of game duration. This gives insight into tempo and their efficiency.
 
-2. **`kda15`**: A kill-death ratio, defined as `(killsat15 + 1) / (deathsat15 + 1)`, which captures combat efficiency while avoiding division-by-zero errors. A higher `kda15` often corresponds to a stronger early game dominance.
+### Features Added and Why
 
-These features were chosen because they reflect capture meaningful elements of the game. Faster gold accumulation and better combat stats are both key indicators of a game being a "stomp."
+To improve the model’s predictive performance, I engineered two new features:
 
-For the final model, I used a **Random Forest Classifier**, which is well-suited to capturing non-linear interactions between variables. I used a pipeline that applied:
+- `gold_per_minute`: This is the gold differential at 15 minutes divided by 900 (seconds), capturing the pace at which a team builds a gold lead. Since stomps are often characterized by rapid economic dominance, this metric reflects a team’s speed and efficiency.
 
-- **Standard scaling** for the original quantitative features (`golddiffat15`, `killsat15`, `deathsat15`)
-- **Quantile transformation** (to normalize skew) for the engineered features (`gold_per_min`, `kda15`) and `gamelength`
-- **One-hot encoding** for the categorical features (`firstdragon`, `firstherald`, `firsttower`) after imputing missing values
+- `kda_15`: Calculated as `(killsat15 + assistsat15 + 1) / (deathsat15 + 1)`, this kill-death-assist ratio represents early combat success and survivability. High values here typically correlate with stronger early performance and often leads a stomp.
 
-### Hyperparameter Tuning
 
-To optimize the model, I used GridSearchCV with 5-fold cross-validation, testing combinations of:
+### Feature Types and Encodings
 
-- `n_estimators`: [50, 100, 150]
-- `max_depth`: [5, 10, 20, None]
+The final model used a total of **20 features**, including:
 
-The best hyperparameters found were:
+- **Quantitative features (17)**:
+  - These include standard early-game metrics such as `golddiffat10`, `xpdiffat10`, `visionscore`, as well as the two engineered features: `gold_per_minute` and `kda_15`.
+  - `StandardScaler` was applied to common early-game features to normalize them.
+  - `QuantileTransformer` was used on the engineered features to reduce skewness.
+  - Missing values in numeric features were imputed using the mean.
+
+- **Nominal categorical features (3)**:
+  - `firstblood`, `firstdragon`, and `firstherald` were imputed using the most frequent value and encoded using one-hot encoding.
+
+There were no ordinal features in this dataset.
+
+---
+
+### Modeling Algorithm and Hyperparameter Tuning
+
+The final model used was a `RandomForestClassifier`. I used **GridSearchCV** with 5-fold cross-validation to select the best combination of hyperparameters:
+
+- `n_estimators`: [50, 100]
+- `max_depth`: [10, 20, None]
+- `min_samples_split`: [2, 5]
+
+**Best Parameters Found**:
 - `n_estimators = 50`
 - `max_depth = 10`
+- `min_samples_split = 5`
 
-### Final Model Performance
+These hyperparameters offered the best trade-off between underfitting and overfitting based on cross-validation F1 score.
 
-Using these hyperparameters, the final model achieved an **F1 score of 0.9902** on the same test set as the baseline. This is a big improvement over the baseline score of 0.5303!
+
+### Performance Comparison
+
+- **Baseline Model (Logistic Regression)**  
+  - Accuracy: 0.8867  
+  - F1 Score: 0.0082  
+
+- **Final Model (Random Forest)**  
+  - Accuracy: **0.9999**  
+  - F1 Score: **0.8333**
+
+The final model significantly improved upon the baseline, especially the **F1 score**. The F1 score is used because it balances precision and recall, making it ideal for evaluating models on imbalanced classification tasks. The substantial improvement in F1 score indicates that the final model is far more effective at identifying “stomp” games, achieving both high precision and recall.
 
 
 ## Fairness Analysis
