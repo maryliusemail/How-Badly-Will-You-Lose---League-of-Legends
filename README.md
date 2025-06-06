@@ -105,7 +105,10 @@ The distribution of game lengths is the same in games with low kill difference a
 **Alternative Hypothesis (H₁):**  
 The distribution of game lengths is different in games with low kill difference and high kill difference at 15 minutes.
 
-We used a permutation test comparing the mean game length of two groups: games with a **low kill difference (< 3)** and those with a **high kill difference (≥ 3)** at 15 minutes. The observed test statistic (difference in means) was **-136.331 seconds**, and the resulting **p-value was 0.0000**.
+
+We used a permutation test to evaluate the difference in mean game length between two groups: games with low kill difference (< 3) and games with high kill difference (≥ 3) at 15 minutes. The test statistic is the difference in mean game length between the two groups, and we used a significance level of 0.05.
+
+The observed difference in mean game length was -136.332 seconds, and the p-value was 0.0000. This suggests that, under the null hypothesis, such a large difference in game duration would be extremely unlikely to occur by chance
 
 <iframe
   src="assets/gamelength_killdiff15_permutation.html"
@@ -114,7 +117,7 @@ We used a permutation test comparing the mean game length of two groups: games w
   frameborder="0"
 ></iframe>
 
-This p-value is well below the standard significance threshold of 0.05, so we **reject the null hypothesis**. This provides strong statistical evidence that early-game dominance (measured by kill difference at 15 minutes) is associated with significantly shorter game durations. This means that early aggression often leads to quicker wins in League of Legends.
+We find strong evidence to reject the null hypothesis. Games with a high kill difference at 15 minutes tend to be significantly shorter than games with a low kill difference. This result suggests that early-game combat dominance is associated with faster game conclusions. However, as this is an observational analysis and not a randomized experiment, we cannot claim a causal relationship a strong association.
 
 ## Framing a Prediction Problem
 
