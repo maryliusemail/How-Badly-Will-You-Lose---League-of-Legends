@@ -61,13 +61,17 @@ Teams in stomp games average significantly more kills (3.37 vs. 1.27), assists (
 
 ### NMAR Column
 
-Yes, I believe the column `firstherald` in my dataset is **Not Missing At Random (NMAR)**. The missingness of this column appears to be tied to how the game was played. Specifically, matches where `firstherald` is missing often have fewer kills by 15 minutes, suggesting a slower-paced or less aggressive early game. This implies that no team may have attempted to take the Rift Herald, and therefore the data was never recorded.
+Yes, I believe the column `firstherald` in my dataset is **Not Missing At Random (NMAR)**. When firstherald is 1, the team secured the Rift Herald; 0 means the opponent did. If the value is missing (NaN), it's likely because no team secured the Herald. The missingness of this column appears to be tied to how the game was played. Specifically, matches where `firstherald` is missing often have fewer kills by 15 minutes, suggesting a slower-paced and less aggressive early game. This implies that no team may have attempted to take the Rift Herald, and therefore the data was never recorded. 
 
-Since the missingness seems related to in-game behavior—such as early-game tempo or team strategy—it is not due to random error or chance, but rather tied to unobserved player decisions. This makes the missingness dependent on the underlying (and unrecorded) game flow, which is why I classify it as NMAR.
+Since the missingness seems related to in-game behavior—such as early-game tempo and agression and is not due to random error or chance, but rather tied to unobserved player decisions, which is why I classify it as NMAR.
 
-To possibly treat this column as **Missing At Random (MAR)** instead, I would need more contextual data. For instance, knowing whether the Herald spawned at all, whether teams moved toward the objective, or if the game ended before it became relevant could help explain the missingness based on observed variables. With that information, a predictive model could account for the missing values in a MAR framework.
+To possibly treat this column as **Missing At Random (MAR)** instead, I would need more context. For instance, knowing whether the Herald spawned at all, whether teams moved toward the objective, or if the game ended before it became relevant to have a herald could help explain the missingness based on observed variables. With those extra information, we can potentially treat it as Missing At Random,
 
 ### Permutation Test: Kills at 15 Minutes vs. First Herald Missingness
+
+- Null Hypothesis (H₀): The missingness in `firstherald` is not associated with `killsat15`; any observed difference is due to chance.
+
+- Alternative Hypothesis (H₁): The missingness in `firstherald` is associated with `killsat15`; the observed difference is unlikely to be due to chance.
 
 <iframe
   src="assets/firstherald_missingness_test.html"
@@ -77,6 +81,21 @@ To possibly treat this column as **Missing At Random (MAR)** instead, I would ne
 ></iframe>
 
 The plot above shows the null distribution of the difference in mean kills at 15 minutes between games where the `firstherald` value is missing and where it is not. The observed difference (red dashed line) is **-3.259**, and the computed p-value is **0.0000**. This result suggests that the missingness of `firstherald` is not random — it likely depends on early-game performance, specifically team kills by the 15-minute mark.
+
+### Permutation Test: Result vs. First Herald Missingness
+
+- Null Hypothesis (H₀): The missingness in `firstherald` is not associated with `result`; any observed difference in win rate is due to chance.
+
+- Alternative Hypothesis (H₁): The missingness in `firstherald` is associated with `result`; the observed difference in win rate is unlikely to be due to chance.
+
+<iframe
+  src="assets/result_vs_firstherald_missingness.html"
+  width="800"
+  height="600"
+  frameborder="0"
+></iframe>
+
+The plot above shows the null distribution of the difference in mean match outcome (result) between games where the firstherald value is missing and where it is not. The observed difference (red dashed line) is 0.000, and the computed p-value is 1.0000. This result provides no evidence of an association between firstherald missingness and match outcome, suggesting that whether or not the Herald was recorded is not related to whether the team won or lost.
 
 ## Hypothesis Testing
 
