@@ -114,7 +114,7 @@ We used a permutation test comparing the mean game length of two groups: games w
   frameborder="0"
 ></iframe>
 
-This p-value is well below the standard significance threshold of 0.05, so we **reject the null hypothesis**. This provides strong statistical evidence that early-game dominance (measured by kill difference at 15 minutes) is associated with significantly shorter game durations. In other words, early aggression often leads to quicker wins in League of Legends.
+This p-value is well below the standard significance threshold of 0.05, so we **reject the null hypothesis**. This provides strong statistical evidence that early-game dominance (measured by kill difference at 15 minutes) is associated with significantly shorter game durations. This means that early aggression often leads to quicker wins in League of Legends.
 
 ## Framing a Prediction Problem
 
