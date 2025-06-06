@@ -34,7 +34,7 @@ Finally, I created a custom binary target column, is_stomp, which flags whether 
   frameborder="0">
 </iframe>
 
-This plot shows the distribution of game lengths across all matches.
+This plot shows the distribution of game lengths (in seconds) across all matches in the dataset. Most games last between 1500 and 2200 seconds (approximately 25 to 36 minutes), forming a slightly right-skewed bell curve that reflects the typical pacing of professional League of Legends matches, with fewer extremely short or long games.
 
 ### Gold vs. Kills at 15 Minutes – Stomp Comparison
 
@@ -44,8 +44,8 @@ This plot shows the distribution of game lengths across all matches.
   height="500"
   frameborder="0">
 </iframe>
+This scatter plot shows the relationship between gold difference and kills at 15 minutes, with color indicating whether the match was a stomp. There is a strong positive correlation between early gold and kill leads, and stomp games (in yellow) tend to cluster at the extremes.
 
-This plot shows how gold and kill counts at 15 minutes vary between stomp and non-stomp games. Stomps tend to have higher gold and kill values early on.
 ### Average Combat Stats at 15 Minutes by Stomp Label
 
 |   is_stomp |   assistsat15 |   deathsat15 |   killsat15 |
