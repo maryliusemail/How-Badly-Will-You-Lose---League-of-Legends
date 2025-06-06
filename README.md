@@ -232,7 +232,7 @@ I chose **precision** as the evaluation metric, as it reflects how often the mod
 
 ### Hypotheses
 
-- **Null Hypothesis (H₀)**: The model is fair. Precision is equal for both groups, and any observed difference is due to chance.
+- **Null Hypothesis (H₀)**: The model is fair. Precision is equal for both groups (dragon or no dragon), and any observed difference is due to chance.
 - **Alternative Hypothesis (H₁)**: The model is unfair. Precision is lower for teams that did **not** secure first dragon (Group X).
 
 ### Method
@@ -241,12 +241,11 @@ Using the final fitted Random Forest model (`n_estimators = 50`, `max_depth = 10
 
 ### Results and Conclusion
 
-- **Observed Precision Difference (Y - X)**: **-0.0004**  
-- **P-value**: **0.5400**
+- Observed Precision Difference (Y - X): 0.0000
+  
+- P-value: 0.7610
 
-The observed precision difference between the two groups was extremely small and not statistically significant, with a p-value of 0.5400. As a result, we **fail to reject the null hypothesis**, meaning that we **do not find evidence of unfairness** in model performance between teams that secured the first dragon and those that did not.
-
-This suggests that the model performs **equally well across both groups**, at least in terms of precision. While fairness should always be considered in deployment, the results here indicate no immediate concern based on this dimension of in-game performance.
+The fairness analysis shows that the precision of the model is nearly identical between teams that secured the first dragon and those that did not. With an observed precision difference of 0.0000 and a p-value of 0.7610, we fail to reject the null hypothesis. This means we do not have sufficient evidence to conclude that the model is unfair. The results suggest that the final Random Forest model treats both groups fairly with respect to the firstdragon feature.
 
 
 
