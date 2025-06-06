@@ -134,93 +134,106 @@ I chose is_stomp as the target because it captures extreme, one-sided games that
 To evaluate the model, I want to use the F1 score, which balances precision and recall. F1 is particularly suitable for this task because stomps are relatively rare in the dataset. Unlike accuracy, which can be misleading when classes are imbalanced, F1 ensures that the model is effectively identifying both stomp and non-stomp games.
 
 
-## Baseline Model
-For my baseline model, I used a **Logistic Regression classifier** with balanced class weights to account for the severe class imbalance in the binary target variable `is_stomp`. The model was trained on five features selected for their potential to capture early game advantages:
+## Baseline Modele
+For my baseline model, I used a Logistic Regression classifier. This is a binary classification task where the goal is to predict whether a game is a stomp, defined as a game that ends within 25 minutes and involves a significant gold differential at the 15-minute mark.
 
-- **Quantitative features – 3**:  
-  - `golddiffat10`  
-  - `csdiffat15`  
-  - `killsat15`  
-  These continuous numerical features represent early economic and combat leads that could signal a snowballing game.
+Dataset Balancing
+To ensure the model had equal exposure to both outcomes, I constructed a balanced dataset by sampling an equal number of stomp (is_stomp = 1) and non-stomp (is_stomp = 0) games—5,346 of each. This prevents the model from being biased toward the majority class and enables better evaluation using metrics like the F1 score.
 
-- **Nominal categorical features – 2**:  
-  - `firstherald`  
-  - `firstdragon`  
-  These are binary indicators that reflect whether the team secured key early-game objectives.
+Features Used
+The model uses a total of 6 features, including:
 
-There were no ordinal features used in this model.
+3 quantitative (numerical):
 
-To prepare the data:
-- I **dropped rows with missing values in categorical features** to ensure clean encodings.
-- I applied **mean imputation and standard scaling** (`StandardScaler`) to the quantitative features to normalize their ranges.
-- For the categorical features, I used **one-hot encoding** with `handle_unknown='ignore'` to convert them into a machine-readable format.
+golddiffat10: Gold difference at 10 minutes
 
-I split the dataset using an 80/20 **stratified train-test split** to preserve class proportions. The model was evaluated using both **accuracy** and **F1 score**:
+csdiffat15: CS difference at 15 minutes
 
-- **Accuracy**: 0.8867  
-- **F1 Score**: 0.0082
+killsat15: Kills at 15 minutes
 
-While the model achieved high accuracy, this is misleading due to the imbalance of the target variable. The extremely low F1 score indicates that the model performs poorly at identifying the minority class (`is_stomp = 1`). The F1 score is used to validate it because it balances precision and recall, making it ideal for evaluating models on imbalanced classification tasks. Therefore, I do **not consider this model to be good**, but it serves as a baseline for further improvement.
+3 nominal (categorical):
 
+side: Whether the team was Blue or Red
+
+patch: Version of the game patch
+
+playoffs: Whether the match occurred during playoffs
+
+There are no ordinal features in this setup.
+
+Encodings and Preprocessing
+- Numerical features were standardized using StandardScaler.
+
+- Categorical features were encoded using OneHotEncoder.
+
+Model Performance
+Accuracy: 0.6844
+
+F1 Score: 0.6653
+
+Assessment
+This baseline model serves as a good starting point. While Logistic Regression is a simple linear model, it performs reasonably well here. The use of a balanced dataset and F1 score for evaluation helps avoid misleading accuracy metrics and gives a clearer view of performance on both classes.
 
 
 ## Final Model
 
-For my final model, I used a **Random Forest Classifier** with balanced class weights to account for the strong class imbalance in the binary target variable `is_stomp`. This model is well-suited for classifications, especially in cases with complex feature interactions and imbalanced classes. It was selected due to its ability to capture nonlinear patterns and dependencies between features, which is important in this case.
+For my final model, I used a Random Forest Classifier to predict whether a game is a stomp — defined as a match ending in under 25 minutes with a gold lead of at least 1500 for the winning team at the 15-minute mark. This is a binary classification task where the target variable is is_stomp, and the goal is to identify games that end in decisive wins based on early indicators. I selected a Random Forest Classifier due to its ability to model nonlinear relationships and handle complex feature and their interactions.
 
+As in the baseline model, I first created a balanced dataset by sampling an equal number of stomp (1) and non-stomp (0) games (5,346 of each). This ensures the model is not biased toward predicting the majority class and learns meaningful distinctions between the two outcomes.
 
-### Features Added and Why
+Features Added and Why
+To improve model performance, I engineered two new features designed to capture important game dynamics:
 
-To improve the model’s predictive performance, I engineered two new features:
+gold_per_minute_15: This is the gold differential at 15 minutes divided by 900 seconds (15 minutes). It captures the pace of economic dominance, which is a hallmark of stomp games.
 
-- `gold_per_minute`: This is the gold differential at 15 minutes divided by 900 (seconds), capturing the pace at which a team builds a gold lead. Since stomps are often characterized by rapid economic dominance, this metric reflects a team’s speed and efficiency.
+kda_15: Calculated as (killsat15 + assistsat15 + 1) / (deathsat15 + 1), this metric reflects early-game combat effectiveness. Higher values suggest early dominance and survivability, which often translate into faster wins.
 
-- `kda_15`: Calculated as `(killsat15 + assistsat15 + 1) / (deathsat15 + 1)`, this kill-death-assist ratio represents early combat success and survivability. High values here typically correlate with stronger early performance and often leads a stomp.
+Feature Types and Encodings
+The model used 13 total features, including:
 
+Quantitative (10):
+- golddiffat10, csdiffat10, xpdiffat15, killsat15, deathsat15, gold_per_minute_15, and kda_15.
 
-### Feature Types and Encodings
+Preprocessing for Quantitative columns:
 
-The final model used was a `RandomForestClassifier` with a  total of **20 features**, including:
+StandardScaler was applied to standard in-game metrics that could be very large or small (golddiffat10','csdiffat10', 'xpdiffat15', 'csdiffat15').
 
-- **Quantitative features (17)**:
-  - These include standard early-game metrics such as `golddiffat10`, `xpdiffat10`, `visionscore`, as well as the two engineered features: `gold_per_minute` and `kda_15`.
-  - `StandardScaler` was applied to common early-game features to normalize them.
-  - `QuantileTransformer` was used on the engineered features to reduce skewness.
-  - Missing values in numeric features were imputed using the mean.
+QuantileTransformer was used on the engineered features to handle a possibly skewed distributions ('gold_per_minute_15', 'kda_15').
 
-- **Nominal categorical features (3)**:
-  - `firstblood`, `firstdragon`, and `firstherald` were imputed using the most frequent value and encoded using one-hot encoding.
+Nominal Categorical (3):
+
+- side, patch, and playoffs.
+
+Preprocessing:
+Encoded using OneHotEncoder.
 
 There were no ordinal features in this dataset.
 
+Hyperparameter Tuning
+To optimize model performance, I used GridSearchCV with 5-fold cross-validation to search over the following parameters:
 
-### Hyperparameters
+n_estimators: [50, 100]
 
-I used **GridSearchCV** with 5-fold cross-validation to select the best combination of hyperparameters:
+max_depth: [10, 20, None]
 
-- `n_estimators`: [50, 100]
-- `max_depth`: [10, 20, None]
-- `min_samples_split`: [2, 5]
+min_samples_split: [2, 5]
 
-**Best Parameters Found**:
-- `n_estimators = 50`
-- `max_depth = 10`
-- `min_samples_split = 5`
+Best Parameters Found:
 
-These hyperparameters offered the best trade-off between underfitting and overfitting based on the cross-validation F1 score.
+n_estimators = 100
 
+max_depth = 10
 
-### Performance Comparison
+min_samples_split = 5
 
-- **Baseline Model (Logistic Regression)**  
-  - Accuracy: 0.8867  
-  - F1 Score: 0.0082  
+These settings are the best model that balances complexity and generalization, based on F1 score.
 
-- **Final Model (Random Forest)**  
-  - Accuracy: **0.9999**  
-  - F1 Score: **0.8333**
+Performance Comparison
+Model	Accuracy	F1 Score
+Logistic Regression (Baseline)	0.6844	0.6653
+Random Forest (Final)	0.9107	0.9170
 
-The final model significantly improved upon the baseline, especially the **F1 score**. The F1 score is used because it balances precision and recall, making it ideal for evaluating models on imbalanced classification tasks. The substantial improvement in F1 score indicates that the final model is far more effective at identifying “stomp” games, achieving both high precision and recall.
+The Random Forest model significantly outperformed the baseline in both accuracy and F1 score. The improved F1 score reflects the model’s better balance of precision and recall, meaning it more reliably detects stomp games without overpredicting them.
 
 
 ## Fairness Analysis
